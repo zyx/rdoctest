@@ -28,13 +28,19 @@ module Rdoctest
   #   >> end
   #   => nil
   #
+  #   >> ["a","multiline","result"]
+  #   => ["a",
+  #   =>  "multiline",
+  #   =>  "result"
+  #   => ]
+  #
   # Use ellipses for partial matches.
   #
   #   >> ok
   #   NameError: undefined local variable or method `a'...
   class Runner
     @@ruby = /(.+?)# =>([^\n]+\n)/m
-    @@irb  = /((?:^>> [^\n]+\n)+)((?:(?!^(?:>>|=>))[^\n]+\n)*)(^=> [^\n]+)?/m
+    @@irb  = /((?:^>> [^\n]+\n)+)((?:(?!^(?:>>|=>))[^\n]+\n)*)((?:^=> [^\n]+\n)+)*/m
 
     attr_reader :files, :options
 
@@ -115,11 +121,12 @@ module Rdoctest
                 end
 
                 if scanner[3]
-                  expected = scanner[3].sub(/^=> /, '').strip
+                  expected = scanner[3].gsub(/^=> ([^\n]*)\n?/, '\1').strip
                   assert_eval expected, result.inspect, filename,
                     expected_lineno
                 end
               end
+
             end
           end
         end
