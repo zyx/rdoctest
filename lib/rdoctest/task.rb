@@ -31,7 +31,9 @@ module Rdoctest
     def define
       desc name ? "Run doctests for #{name}" : 'Run doctests'
       task name do
-        system "#{run_code} #{ruby_opts_string} #{file_list_string}"
+        unless system "#{run_code} #{ruby_opts_string} #{file_list_string}"
+          abort 'rdoctest failed'
+        end
       end
     end
 
@@ -51,7 +53,7 @@ module Rdoctest
 
     def run_code
       $LOAD_PATH.each do |path|
-        file = File.join path, 'rdoctest'
+        file = File.join path,'..','bin','rdoctest'
         return file if File.executable?(file)
       end
     end
